@@ -72,7 +72,22 @@ A modern collaborative learning platform that helps users discover educational r
 - Python 3.8+
 - Git
 
-### Backend Setup
+### Quick Start (Recommended)
+
+#### For macOS/Linux:
+```bash
+cd backend
+chmod +x run.sh
+./run.sh
+```
+
+#### For Windows:
+```bash
+cd backend
+run.bat
+```
+
+### Backend Setup (Manual)
 
 1. **Navigate to backend folder:**
    ```bash
@@ -99,24 +114,15 @@ A modern collaborative learning platform that helps users discover educational r
    pip install -r requirements.txt
    ```
 
-5. **Create `.env` file from example:**
-   ```bash
-   cp .env.example .env
-   ```
+5. **The `.env` file is already configured** - no changes needed for local development
 
-6. **Update `.env` with your settings** (optional for local development):
-   ```
-   SECRET_KEY=your-super-secret-key
-   YOUTUBE_API_KEY=your-youtube-api-key
-   BING_SEARCH_API_KEY=your-bing-search-api-key
-   ```
-
-7. **Run the FastAPI server:**
+6. **Run the FastAPI server:**
    ```bash
    python main.py
    ```
 
    The backend will be running on `http://localhost:8000`
+   - API documentation: `http://localhost:8000/docs`
 
 ### Frontend Setup
 
