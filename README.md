@@ -311,21 +311,35 @@ If you need to change the database (e.g., from SQLite to PostgreSQL):
 
 ## Troubleshooting
 
+### Login Page Errors
+
+**"Cannot connect to backend server"**
+- Make sure the FastAPI backend is running on `http://localhost:8000`
+- Run `python main.py` in the `backend` folder
+- Check that both frontend and backend are using the correct ports
+
+**Default user not logging in**
+- The default user `abc@abc.com` / `abc123` is created automatically when the backend starts
+- If you deleted the database, restart the backend to recreate it
+- Check the backend console output for "✓ Default user created" message
+
 ### CORS Errors
 If you get CORS errors, make sure:
 1. Backend is running on `http://localhost:8000`
 2. Frontend is running on `http://localhost:5173`
-3. CORS is properly configured in backend config
+3. CORS_ORIGINS in `.env` includes `http://localhost:5173`
 
 ### Database Issues
 - SQLite database is created automatically on first run
-- Delete `learnconnect.db` to reset the database
+- Delete `learnconnect.db` to reset the database (default user will be recreated)
 - For PostgreSQL, ensure the database exists before running
+- Update `DATABASE_URL` in `backend/.env` to use PostgreSQL
 
 ### API Key Issues
 - YouTube and Bing API keys are optional for development
 - The app will show placeholder results if keys are not configured
 - See "Getting API Keys" section above
+- Keys can be added later without restarting (update `.env` and restart backend)
 
 ## Support and Contributions
 
