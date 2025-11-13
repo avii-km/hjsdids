@@ -145,6 +145,15 @@ run.bat
 
    The frontend will be running on `http://localhost:5173`
 
+## Demo Credentials
+
+A default test user is automatically created when the backend starts:
+
+**Email:** `abc@abc.com`
+**Password:** `abc123`
+
+You can use these credentials to log in and test the application.
+
 ## Development Workflow
 
 ### Terminal 1 - Backend
@@ -154,12 +163,19 @@ source venv/bin/activate  # or venv\Scripts\activate on Windows
 python main.py
 ```
 
+Or use the quick start script:
+```bash
+cd backend
+./run.sh  # macOS/Linux
+# or run.bat  # Windows
+```
+
 ### Terminal 2 - Frontend
 ```bash
 pnpm dev
 ```
 
-The frontend will automatically proxy requests to the backend at `http://localhost:8000`.
+The frontend will connect to the backend at `http://localhost:8000`.
 
 ## API Endpoints
 
