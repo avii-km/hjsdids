@@ -17,7 +17,7 @@ class Settings(BaseSettings):
     BING_SEARCH_API_KEY: str = ""
 
     # CORS
-    CORS_ORIGINS: list = ["http://localhost:5173", "http://localhost:3000"]
+    CORS_ORIGINS: list = ["http://localhost:5173", "http://localhost:3000", "*"]
 
     class Config:
         env_file = ".env"
@@ -29,7 +29,7 @@ class Settings(BaseSettings):
             try:
                 self.CORS_ORIGINS = json.loads(self.CORS_ORIGINS)
             except (json.JSONDecodeError, TypeError):
-                self.CORS_ORIGINS = ["http://localhost:5173", "http://localhost:3000"]
+                self.CORS_ORIGINS = ["*"]
 
 
 @lru_cache()

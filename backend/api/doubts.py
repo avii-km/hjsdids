@@ -15,12 +15,16 @@ def create_doubt(
     current_user: User = Depends(get_current_user),
     db: Session = Depends(get_db),
 ):
+
+    print('hereee')
+
     new_doubt = Doubt(
         topic=doubt_data.topic,
         title=doubt_data.title,
         description=doubt_data.description,
         created_by=current_user.id,
     )
+    print(new_doubt)
 
     db.add(new_doubt)
     db.commit()
@@ -29,7 +33,7 @@ def create_doubt(
     return DoubtResponse.model_validate(new_doubt)
 
 
-@router.get("", response_model=list[DoubtDetailResponse])
+@router.post("", response_model=list[DoubtDetailResponse])
 def list_doubts(
     topic: str = None,
     db: Session = Depends(get_db),
@@ -44,7 +48,7 @@ def list_doubts(
     return [DoubtDetailResponse.model_validate(doubt) for doubt in doubts]
 
 
-@router.get("/{doubt_id}", response_model=DoubtDetailResponse)
+@router.post("/{doubt_id}", response_model=DoubtDetailResponse)
 def get_doubt(doubt_id: int, db: Session = Depends(get_db)):
     doubt = db.query(Doubt).filter(Doubt.id == doubt_id).first()
 

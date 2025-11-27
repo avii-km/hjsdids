@@ -11,7 +11,7 @@ router = APIRouter(prefix="/api/search", tags=["search"])
 settings = get_settings()
 
 
-@router.get("/{topic}", response_model=SearchResultsResponse)
+@router.post("/{topic}", response_model=SearchResultsResponse)
 def search_topic(
     topic: str,
     current_user: User = Depends(get_current_user),

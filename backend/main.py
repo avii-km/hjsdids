@@ -1,17 +1,41 @@
+import logging
+
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
+from contextlib import asynccontextmanager
+
 from database import engine, Base, SessionLocal
 from config import get_settings
-from api import auth, groups, search, dashboard, doubts
 from models import User
-from auth import get_password_hash
+from auth import get_password_hash   # Only keep if needed for default user
+
+from fastapi import APIRouter, Depends, HTTPException, status
+from sqlalchemy.orm import Session
+from datetime import timedelta
+from typing import Optional
+from database import get_db
+from models import User
+from schemas import UserCreate, UserLogin, TokenResponse, UserResponse
+from auth import get_password_hash, verify_password, create_access_token, decode_token
+from config import get_settings
+
+from fastapi import APIRouter, Depends
+from sqlalchemy.orm import Session
+from sqlalchemy import desc
+from database import get_db
+from models import User, SearchHistory, Topic
+from schemas import DashboardResponse, SearchHistoryResponse, GroupResponse, TopicResponse
+from dependencies import get_current_user
+from api import auth, groups, search, dashboard, doubts
 
 settings = get_settings()
 
+# Create all tables (runs only once on startup)
 Base.metadata.create_all(bind=engine)
+logging.basicConfig(level=logging.INFO)
 
 def create_default_user():
-    """Create a default user for testing if it doesn't exist"""
+    """Create a default test user if it doesn't exist"""
     db = SessionLocal()
     try:
         default_email = "abc@abc.com"
@@ -34,19 +58,40 @@ def create_default_user():
     finally:
         db.close()
 
+
+# -------------------------------
+# 🚀 FIXED: Lifespan handler
+# -------------------------------
+@asynccontextmanager
+async def lifespan(app: FastAPI):
+    print("🚀 Application starting...")
+    create_default_user()   # Startup logic
+
+    yield
+
+    print("🛑 Application shutting down...")
+    # cleanup logic here (optional)
+
+
+# -------------------------------
+# 🚀 Correct FastAPI app instance
+# -------------------------------
 app = FastAPI(
     title="LearnConnect API",
     description="A collaborative learning platform API",
     version="1.0.0",
+    lifespan=lifespan,
 )
 
+# CORS
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=settings.CORS_ORIGINS,
+    allow_origins=["*", "https://c94fd538-4553-4c81-9e4a-ee591eadfebc-00-3tm0zpl8m3mzx.spock.replit.dev"],
     allow_credentials=True,
-    allow_methods=["*"],
+    allow_methods=["POST"],
     allow_headers=["*"],
 )
+
 
 app.include_router(auth.router)
 app.include_router(groups.router)
@@ -55,17 +100,33 @@ app.include_router(dashboard.router)
 app.include_router(doubts.router)
 
 
-@app.on_event("startup")
-def startup_event():
-    create_default_user()
+# -------------------------------
+# Routes
+# -------------------------------
+@app.get("/home")
+def home():
+    return {"status": "ok"}
+
+@app.get("/lif")
+def lif():
+    return {"status": "ok"}
+
+
 
 
 @app.get("/health")
 def health_check():
-    return {"status": "ok"}
+    return {"status": "health"}
 
 
+# -------------------------------
+# 🚀 Development server
+# -------------------------------
 if __name__ == "__main__":
     import uvicorn
-
-    uvicorn.run(app, host="0.0.0.0", port=8000)
+    uvicorn.run(
+        "main:app",   # IMPORTANT: import string (required for reload!)
+        host="0.0.0.0",
+        port=8000,
+        reload=True
+    )

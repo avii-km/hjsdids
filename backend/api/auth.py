@@ -1,3 +1,5 @@
+import logging
+
 from fastapi import APIRouter, Depends, HTTPException, status
 from sqlalchemy.orm import Session
 from datetime import timedelta
@@ -67,8 +69,10 @@ def login(user_data: UserLogin, db: Session = Depends(get_db)):
     }
 
 
-@router.get("/me", response_model=UserResponse)
+@router.post("/me", response_model=UserResponse)
 def get_current_user(token: str = None, db: Session = Depends(get_db)):
+    logging.error(token)
+    print(token)
     if not token:
         raise HTTPException(
             status_code=status.HTTP_401_UNAUTHORIZED,
@@ -78,6 +82,7 @@ def get_current_user(token: str = None, db: Session = Depends(get_db)):
     from auth import decode_token
 
     payload = decode_token(token)
+    logging.error(payload)
     if not payload:
         raise HTTPException(
             status_code=status.HTTP_401_UNAUTHORIZED,
@@ -85,6 +90,7 @@ def get_current_user(token: str = None, db: Session = Depends(get_db)):
         )
 
     email = payload.get("sub")
+    print(email)
     if not email:
         raise HTTPException(
             status_code=status.HTTP_401_UNAUTHORIZED,
@@ -92,10 +98,12 @@ def get_current_user(token: str = None, db: Session = Depends(get_db)):
         )
 
     user = db.query(User).filter(User.email == email).first()
+    print(user)
     if not user:
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND,
             detail="User not found",
         )
-
+    sa = UserResponse.model_validate(user)
+    print(sa)
     return UserResponse.model_validate(user)

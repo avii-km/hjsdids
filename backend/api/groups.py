@@ -8,18 +8,20 @@ from dependencies import get_current_user
 router = APIRouter(prefix="/api/groups", tags=["groups"])
 
 
-@router.post("", response_model=GroupResponse)
+@router.post("/create", response_model=GroupResponse)
 def create_group(
     group_data: GroupCreate,
     current_user: User = Depends(get_current_user),
     db: Session = Depends(get_db),
 ):
+    print(group_data)
     topic = db.query(Topic).filter(Topic.id == group_data.topic_id).first()
-    if not topic:
-        raise HTTPException(
-            status_code=status.HTTP_404_NOT_FOUND,
-            detail="Topic not found",
-        )
+    print(topic)
+    # if not topic:
+    #     raise HTTPException(
+    #         status_code=status.HTTP_404_NOT_FOUND,
+    #         detail="Topic not found",
+    #     )
 
     new_group = Group(
         title=group_data.title,
@@ -36,13 +38,20 @@ def create_group(
     return GroupResponse.model_validate(new_group)
 
 
-@router.get("", response_model=list[GroupResponse])
+@router.post("", response_model=list[GroupResponse])
 def list_groups(db: Session = Depends(get_db)):
     groups = db.query(Group).all()
-    return [GroupResponse.model_validate(group) for group in groups]
+    arr = []
+    for i in groups:
+        try:
+            x = GroupResponse.model_validate(i)
+            arr.append(x)
+        except:
+            continue
+    return arr
 
 
-@router.get("/{group_id}", response_model=GroupResponse)
+@router.post("/{group_id}", response_model=GroupResponse)
 def get_group(group_id: int, db: Session = Depends(get_db)):
     group = db.query(Group).filter(Group.id == group_id).first()
     if not group:
