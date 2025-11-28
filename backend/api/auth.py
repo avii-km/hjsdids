@@ -21,7 +21,7 @@ def signup(user_data: UserCreate, db: Session = Depends(get_db)):
             status_code=status.HTTP_400_BAD_REQUEST,
             detail="Email already registered",
         )
-
+    print("pass", user_data.password, user_data.email)
     hashed_password = get_password_hash(user_data.password)
     new_user = User(
         name=user_data.name,
@@ -49,6 +49,7 @@ def signup(user_data: UserCreate, db: Session = Depends(get_db)):
 @router.post("/login", response_model=TokenResponse)
 def login(user_data: UserLogin, db: Session = Depends(get_db)):
     user = db.query(User).filter(User.email == user_data.email).first()
+    print(user, user_data.password, user.password_hash)
     if not user or not verify_password(user_data.password, user.password_hash):
         raise HTTPException(
             status_code=status.HTTP_401_UNAUTHORIZED,

@@ -30,26 +30,30 @@ inspector = inspect(engine)
 tables = inspector.get_table_names()
 print(tables)
 
-from models import Group
+from models import Group, User
 # rows = session.query(Group).all()
 
 
-
-
-from sqlalchemy.orm import Session
-
-session = Session(engine)
-
-row = session.query(Group).filter(Group.id == 1).first()
-if row:
-    session.delete(row)
-    session.commit()
-
-
 with engine.connect() as conn:
-    rows = conn.execute(select(Group)).fetchall()
+    rows = conn.execute(select(User)).fetchall()
     for r in rows:
         print(dict(r._mapping))
+
+
+# from sqlalchemy.orm import Session
+#
+# session = Session(engine)
+#
+# row = session.query(User).filter(User.email == "abc@abc.com").first()
+# if row:
+#     session.delete(row)
+#     session.commit()
+
+
+# with engine.connect() as conn:
+#     rows = conn.execute(select(Group)).fetchall()
+#     for r in rows:
+#         print(dict(r._mapping))
 
 
 # from sqlalchemy.orm import Session

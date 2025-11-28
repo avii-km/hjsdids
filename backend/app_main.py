@@ -26,7 +26,7 @@ from database import get_db
 from models import User, SearchHistory, Topic
 from schemas import DashboardResponse, SearchHistoryResponse, GroupResponse, TopicResponse
 from dependencies import get_current_user
-from api import auth, groups, search, dashboard, doubts
+from api import auth, groups, search, dashboard, doubts, project
 
 settings = get_settings()
 
@@ -98,6 +98,8 @@ app.include_router(groups.router)
 app.include_router(search.router)
 app.include_router(dashboard.router)
 app.include_router(doubts.router)
+app.include_router(project.router)
+
 
 
 # -------------------------------
@@ -125,8 +127,8 @@ def health_check():
 if __name__ == "__main__":
     import uvicorn
     uvicorn.run(
-        "main:app",   # IMPORTANT: import string (required for reload!)
+        "app_main:app",   # IMPORTANT: import string (required for reload!)
         host="0.0.0.0",
-        port=8000,
+        port=8051,
         reload=True
     )

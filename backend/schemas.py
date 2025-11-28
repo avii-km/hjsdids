@@ -132,3 +132,29 @@ class DashboardResponse(BaseModel):
 class SearchResultsResponse(BaseModel):
     videos: List[dict]
     articles: List[dict]
+
+
+class ProjectBase(BaseModel):
+    title: str
+    description: Optional[str] = None
+    github_url: Optional[str] = None
+    demo_url: Optional[str] = None
+    technologies: Optional[str] = None
+
+
+class ProjectCreate(ProjectBase):
+    pass
+
+
+class ProjectResponse(ProjectBase):
+    id: int
+    created_by: int
+    created_at: datetime
+    created_by_user: Optional[UserResponse] = None
+
+    class Config:
+        from_attributes = True
+
+
+class ProjectDetailResponse(ProjectResponse):
+    created_by_user: UserResponse

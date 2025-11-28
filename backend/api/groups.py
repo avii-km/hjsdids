@@ -70,6 +70,7 @@ def join_group(
     db: Session = Depends(get_db),
 ):
     group = db.query(Group).filter(Group.id == group_id).first()
+    print(group, group_id)
     if not group:
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND,
@@ -96,6 +97,8 @@ def leave_group(
     db: Session = Depends(get_db),
 ):
     group = db.query(Group).filter(Group.id == group_id).first()
+    print(group_id)
+    print(group)
     if not group:
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND,

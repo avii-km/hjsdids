@@ -31,26 +31,26 @@ def search_topic(
         db.commit()
 
     videos = search_youtube(topic)
-    articles = search_articles(topic)
+    # articles = search_articles(topic)
 
     return {
         "videos": videos,
-        "articles": articles,
+        "articles": [],
     }
 
 
 def search_youtube(query: str) -> list:
-    if not settings.YOUTUBE_API_KEY:
-        return [
-            {
-                "id": f"placeholder_{i}",
-                "title": f"Sample {query} Video {i+1}",
-                "description": f"This is a sample video about {query}. Please configure your YouTube API key to fetch real videos.",
-                "thumbnail": "https://via.placeholder.com/320x180?text=YouTube",
-                "url": f"https://www.youtube.com/watch?v=dQw4w9WgXcQ",
-            }
-            for i in range(3)
-        ]
+    # if not settings.YOUTUBE_API_KEY:
+    #     return [
+    #         {
+    #             "id": f"placeholder_{i}",
+    #             "title": f"Sample {query} Video {i+1}",
+    #             "description": f"This is a sample video about {query}. Please configure your YouTube API key to fetch real videos.",
+    #             "thumbnail": "https://via.placeholder.com/320x180?text=YouTube",
+    #             "url": f"https://www.youtube.com/watch?v=dQw4w9WgXcQ",
+    #         }
+    #         for i in range(3)
+    #     ]
 
     try:
         url = "https://www.googleapis.com/youtube/v3/search"
@@ -59,7 +59,7 @@ def search_youtube(query: str) -> list:
             "q": query,
             "type": "video",
             "maxResults": 10,
-            "key": settings.YOUTUBE_API_KEY,
+            "key": "AIzaSyABao5b5ctJXr2dFxhEVsFSGBSFJLIhlqU",
         }
 
         response = requests.get(url, params=params, timeout=5)
@@ -92,42 +92,66 @@ def search_youtube(query: str) -> list:
 
 
 def search_articles(query: str) -> list:
-    if not settings.BING_SEARCH_API_KEY:
-        return [
-            {
-                "title": f"Sample {query} Article {i+1}",
-                "description": f"This is a sample article about {query}. Please configure your Bing Search API key to fetch real articles.",
-                "url": f"https://example.com/article-{i+1}",
-                "source": "Example Source",
-            }
-            for i in range(3)
-        ]
+    import requests
 
-    try:
-        url = "https://api.bing.microsoft.com/v7.0/search"
-        headers = {"Ocp-Apim-Subscription-Key": settings.BING_SEARCH_API_KEY}
-        params = {
-            "q": query,
-            "count": 10,
-        }
+    url = "https://api.duckduckgo.com/"
+    params = {
+        "q": query,
+        "format": "json",
+        "no_redirect": 1,
+        "no_html": 1
+    }
 
-        response = requests.get(url, headers=headers, params=params, timeout=5)
-        response.raise_for_status()
-        data = response.json()
+    res = requests.get(url, params=params).json()
 
-        articles = []
-        for item in data.get("webPages", {}).get("value", []):
-            articles.append(
-                {
-                    "title": item.get("name", ""),
-                    "description": item.get("snippet", ""),
-                    "url": item.get("url", ""),
-                    "source": item.get("displayUrl", ""),
-                }
-            )
+    articles = []
+    for topic in res.get("RelatedTopics", []):
+        if "Text" in topic and "FirstURL" in topic:
+            articles.append({
+                "title": topic["Text"],
+                "description": topic["Text"],
+                "url": topic["FirstURL"],
+                "source": "DuckDuckGo"
+            })
 
-        return articles
+    return articles
 
-    except Exception as e:
-        print(f"Bing search error: {e}")
-        return []
+    # if not settings.BING_SEARCH_API_KEY:
+    #     return [
+    #         {
+    #             "title": f"Sample {query} Article {i+1}",
+    #             "description": f"This is a sample article about {query}. Please configure your Bing Search API key to fetch real articles.",
+    #             "url": f"https://example.com/article-{i+1}",
+    #             "source": "Example Source",
+    #         }
+    #         for i in range(3)
+    #     ]
+    #
+    # try:
+    #     url = "https://api.bing.microsoft.com/v7.0/search"
+    #     headers = {"Ocp-Apim-Subscription-Key": settings.BING_SEARCH_API_KEY}
+    #     params = {
+    #         "q": query,
+    #         "count": 10,
+    #     }
+    #
+    #     response = requests.get(url, headers=headers, params=params, timeout=5)
+    #     response.raise_for_status()
+    #     data = response.json()
+    #
+    #     articles = []
+    #     for item in data.get("webPages", {}).get("value", []):
+    #         articles.append(
+    #             {
+    #                 "title": item.get("name", ""),
+    #                 "description": item.get("snippet", ""),
+    #                 "url": item.get("url", ""),
+    #                 "source": item.get("displayUrl", ""),
+    #             }
+    #         )
+    #
+    #     return articles
+    #
+    # except Exception as e:
+    #     print(f"Bing search error: {e}")
+    #     return []
